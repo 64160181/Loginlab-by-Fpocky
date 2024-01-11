@@ -30,6 +30,7 @@ if (isset($_GET['login'])) {
   $result = $conn->query($query);
 
   if ($result->num_rows > 0) {
+    global $attempts;
     $row = $result->fetch_assoc();
     $attempts = $row['attempts'];
     $last_attempt = $row['last_attempt'];
@@ -127,6 +128,8 @@ if (isset($_GET['login'])) {
                 <p class="login-card-footer-text">Authentication Success</p>
               <?php } else if ($login_success == 2) { ?>
                   <p class="login-card-footer-text">Authentication Failure</p>
+              <?php } else if ($attempts >= $max_attempts) { ?>
+                  <p class="login-card-footer-text">Authentication Block</p>
               <?php } ?>
               <nav class="login-card-footer-nav">
                 <a href="#!">Terms of use.</a>
