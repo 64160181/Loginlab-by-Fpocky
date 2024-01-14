@@ -16,29 +16,20 @@ if (isset($_POST['submit'])) {
 
     if ($userstatus_row['status'] == 'N') {
         $msg = "Your account is locked";
+    } elseif ($count[0] >= 3) {
+        mysqli_query($dbcon, "UPDATE users SET `status` = 'N' WHERE username = '$username'");
+        $msg = "Too many failed login attempts. Your account is locked";
     } else {
-        $stmt = $dbcon->prepare("SELECT username FROM users WHERE username=? AND password=?");
+        $stmt = $dbcon->prepare("SELECT username FROM users WHERE username=? AND password=SHA1(?)");
         $stmt->bind_param("ss", $username, $password);
         
         $stmt->execute();
         $stmt->store_result();
-        if ($userstatus_row['status'] == 'N') {
-            $msg = "Your account is locked";
-        } elseif ($count[0] >= 3) {
-            mysqli_query($dbcon, "UPDATE users SET `status` = 'N' WHERE username = '$username'");
-            $msg = "Too many failed login attempts. Your account is locked";
-        } else {
-            $stmt = $dbcon->prepare("SELECT username FROM users WHERE username=? AND password=SHA1(?)");
-            $stmt->bind_param("ss", $username, $password);
-            
-            $stmt->execute();
-            $stmt->store_result();
 
-            if ($stmt->num_rows > 0) {
-                $msg = "Login successful";
-            } else {
-                $msg = "Place enter valid login details.";
-            }
+        if ($stmt->num_rows > 0) {
+            $msg = "Login successful";
+        } else {
+            $msg = "Place enter valid login details.";
         }
     }
 }
